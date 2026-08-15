@@ -4,548 +4,871 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Predictive Maintenance System</title>
+
+    <meta
+        name="description"
+        content="Machine learning based predictive maintenance and machine failure detection system"
+    >
+
+    <title>Predictive Maintenance | XGBoost Dashboard</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <div class="container">
+    <div class="app-shell">
 
-        <header class="header">
+        <header class="topbar">
 
-            <div class="logo">
-                ⚙
+            <div class="brand">
+
+                <div class="brand-icon">
+                    ⚙
+                </div>
+
+                <div class="brand-text">
+                    <h1>Predictive Maintenance</h1>
+                    <span>PREDICTIVE MACHINE HEALTH MONITORING</span>
+                </div>
+
             </div>
 
-            <div>
-                <h1>Predictive Maintenance</h1>
-                <p>AI-Powered Machine Failure Prediction</p>
+            <div class="topbar-right">
+
+                <div class="model-badge">
+                    <span class="model-dot"></span>
+                    XGBoost
+                </div>
+
+                <div class="system-status">
+                    <span class="status-dot"></span>
+                    System Online
+                </div>
+
             </div>
 
         </header>
 
 
-        <section class="intro">
+        <main>
 
-            <div>
+            <section class="hero">
 
-                <span class="badge">
-                    MACHINE LEARNING SYSTEM
-                </span>
+                <div class="hero-content">
 
-                <h2>
-                    Machine Condition Analysis
-                </h2>
+                    <span class="eyebrow">
+                        INTELLIGENT INDUSTRIAL MONITORING
+                    </span>
 
-                <p>
-                    Enter the current operating conditions of a machine
-                    to estimate its probability of failure.
-                </p>
+                    <h2>
+                        Predict machine failures
+                        <span>before they happen.</span>
+                    </h2>
 
-            </div>
+                    <p>
+                        Analyze machine operating conditions and
+                        estimate failure probability using an optimized
+                        XGBoost machine learning model.
+                    </p>
 
-        </section>
+                </div>
 
+                <div class="hero-model">
 
-        <section class="main-grid">
+                    <div class="hero-model-label">
+                        DEPLOYED MODEL
+                    </div>
 
+                    <div class="hero-model-name">
+                        XGBoost
+                    </div>
 
-            <div class="card input-card">
+                    <div class="hero-model-info">
+                        <span>Accuracy</span>
+                        <strong>99.05%</strong>
+                    </div>
 
-                <div class="section-title">
-
-                    <span>01</span>
-
-                    <div>
-                        <h2>Operating Conditions</h2>
-                        <p>Enter current machine sensor values</p>
+                    <div class="hero-model-info">
+                        <span>ROC-AUC</span>
+                        <strong>98.36%</strong>
                     </div>
 
                 </div>
 
+            </section>
 
-                <form id="predictionForm">
+
+            <section class="dashboard-grid">
 
 
-                    <div class="form-group">
+                <div class="panel input-panel">
 
-                        <label for="productType">
-                            Product Type
-                        </label>
+                    <div class="panel-header">
 
-                        <select id="productType">
+                        <div>
 
-                            <option value="L">
-                                L - Low
-                            </option>
+                            <span class="panel-number">
+                                01
+                            </span>
 
-                            <option value="M">
-                                M - Medium
-                            </option>
+                            <div>
+                                <h3>Machine Parameters</h3>
 
-                            <option value="H">
-                                H - High
-                            </option>
+                                <p>
+                                    Enter current operating conditions
+                                </p>
+                            </div>
 
-                        </select>
+                        </div>
+
+                        <span class="panel-icon">
+                            ⚙
+                        </span>
 
                     </div>
 
 
-                    <div class="input-grid">
-
+                    <form id="predictionForm">
 
                         <div class="form-group">
 
-                            <label for="airTemperature">
-                                Air Temperature
-                                <span>[K]</span>
+                            <label for="productType">
+                                Product Type
                             </label>
 
-                            <input
-                                type="number"
-                                id="airTemperature"
-                                value="300"
-                                min="290"
-                                max="310"
-                                step="0.1"
+                            <select
+                                id="productType"
                                 required
                             >
+
+                                <option value="L">
+                                    L — Low
+                                </option>
+
+                                <option value="M">
+                                    M — Medium
+                                </option>
+
+                                <option value="H">
+                                    H — High
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="input-grid">
+
+
+                            <div class="form-group">
+
+                                <label for="airTemperature">
+                                    Air Temperature
+                                    <span>K</span>
+                                </label>
+
+                                <div class="input-wrapper">
+
+                                    <input
+                                        type="number"
+                                        id="airTemperature"
+                                        value="300"
+                                        min="290"
+                                        max="310"
+                                        step="0.1"
+                                        required
+                                    >
+
+                                    <span class="input-unit">
+                                        K
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="processTemperature">
+                                    Process Temperature
+                                    <span>K</span>
+                                </label>
+
+                                <div class="input-wrapper">
+
+                                    <input
+                                        type="number"
+                                        id="processTemperature"
+                                        value="310"
+                                        min="300"
+                                        max="320"
+                                        step="0.1"
+                                        required
+                                    >
+
+                                    <span class="input-unit">
+                                        K
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="rotationalSpeed">
+                                    Rotational Speed
+                                    <span>RPM</span>
+                                </label>
+
+                                <div class="input-wrapper">
+
+                                    <input
+                                        type="number"
+                                        id="rotationalSpeed"
+                                        value="1500"
+                                        min="1000"
+                                        max="3000"
+                                        step="10"
+                                        required
+                                    >
+
+                                    <span class="input-unit">
+                                        RPM
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="torque">
+                                    Torque
+                                    <span>NM</span>
+                                </label>
+
+                                <div class="input-wrapper">
+
+                                    <input
+                                        type="number"
+                                        id="torque"
+                                        value="40"
+                                        min="0"
+                                        max="100"
+                                        step="0.5"
+                                        required
+                                    >
+
+                                    <span class="input-unit">
+                                        NM
+                                    </span>
+
+                                </div>
+
+                            </div>
+
 
                         </div>
 
 
                         <div class="form-group">
 
-                            <label for="processTemperature">
-                                Process Temperature
-                                <span>[K]</span>
+                            <label for="toolWear">
+                                Tool Wear
+                                <span>MINUTES</span>
                             </label>
 
-                            <input
-                                type="number"
-                                id="processTemperature"
-                                value="310"
-                                min="300"
-                                max="320"
-                                step="0.1"
-                                required
-                            >
+                            <div class="input-wrapper">
+
+                                <input
+                                    type="number"
+                                    id="toolWear"
+                                    value="100"
+                                    min="0"
+                                    max="300"
+                                    step="1"
+                                    required
+                                >
+
+                                <span class="input-unit">
+                                    MIN
+                                </span>
+
+                            </div>
 
                         </div>
 
 
-                        <div class="form-group">
-
-                            <label for="rotationalSpeed">
-                                Rotational Speed
-                                <span>[rpm]</span>
-                            </label>
-
-                            <input
-                                type="number"
-                                id="rotationalSpeed"
-                                value="1500"
-                                min="1000"
-                                max="3000"
-                                step="10"
-                                required
-                            >
-
-                        </div>
-
-
-                        <div class="form-group">
-
-                            <label for="torque">
-                                Torque
-                                <span>[Nm]</span>
-                            </label>
-
-                            <input
-                                type="number"
-                                id="torque"
-                                value="40"
-                                min="0"
-                                max="100"
-                                step="0.5"
-                                required
-                            >
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label for="toolWear">
-                            Tool Wear
-                            <span>[min]</span>
-                        </label>
-
-                        <input
-                            type="number"
-                            id="toolWear"
-                            value="100"
-                            min="0"
-                            max="300"
-                            step="1"
-                            required
+                        <button
+                            type="submit"
+                            id="predictButton"
+                            class="predict-button"
                         >
 
-                    </div>
+                            <span>
+                                Run AI Analysis
+                            </span>
+
+                            <span class="button-arrow">
+                                →
+                            </span>
+
+                        </button>
 
 
-                    <button
-                        type="submit"
-                        id="predictButton"
-                    >
+                        <div class="analysis-note">
 
-                        <span>
-                            Run Failure Analysis
+                            <span>●</span>
+
+                            Model analysis typically completes
+                            within a few seconds.
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+
+                <div class="panel result-panel">
+
+                    <div class="panel-header">
+
+                        <div>
+
+                            <span class="panel-number">
+                                02
+                            </span>
+
+                            <div>
+                                <h3>Failure Risk Analysis</h3>
+
+                                <p>
+                                    Machine learning-based failure assessment
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <span class="panel-icon">
+                            ◉
                         </span>
 
-                        <span class="button-arrow">
-                            →
-                        </span>
-
-                    </button>
-
-
-                </form>
-
-            </div>
-
-
-            <div class="card result-card">
-
-
-                <div class="section-title">
-
-                    <span>02</span>
-
-                    <div>
-                        <h2>Prediction Result</h2>
-                        <p>AI model assessment</p>
                     </div>
-
-                </div>
-
-
-                <div
-                    id="emptyState"
-                    class="empty-state"
-                >
-
-                    <div class="empty-icon">
-                        ◉
-                    </div>
-
-                    <h3>
-                        Awaiting Analysis
-                    </h3>
-
-                    <p>
-                        Enter machine operating conditions
-                        and run the failure analysis.
-                    </p>
-
-                </div>
-
-
-                <div
-                    id="loading"
-                    class="loading hidden"
-                >
-
-                    <div class="spinner"></div>
-
-                    <h3>
-                        Analyzing Machine
-                    </h3>
-
-                    <p>
-                        Processing sensor conditions...
-                    </p>
-
-                </div>
-
-
-                <div
-                    id="predictionResult"
-                    class="hidden"
-                >
 
 
                     <div
-                        id="riskIndicator"
-                        class="risk-indicator"
+                        id="emptyState"
+                        class="empty-state"
                     >
-                        --
-                    </div>
 
+                        <div class="radar-icon">
 
-                    <div class="probability-section">
+                            <div class="radar-circle"></div>
 
-                        <div class="probability-header">
-
-                            <span>
-                                Failure Probability
-                            </span>
-
-                            <strong id="probability">
-                                --%
-                            </strong>
+                            <div class="radar-center">
+                                ◉
+                            </div>
 
                         </div>
 
+                        <h3>
+                            Ready for Analysis
+                        </h3>
 
-                        <div class="progress-track">
-
-                            <div
-                                id="probabilityBar"
-                                class="progress-bar"
-                            ></div>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="machine-status">
-
-                        <span>
-                            Machine Status
-                        </span>
-
-                        <strong id="machineStatus">
-                            --
-                        </strong>
-
-                    </div>
-
-
-                    <div class="details">
-
-
-                        <div class="detail-box">
-
-                            <span>
-                                Temperature Difference
-                            </span>
-
-                            <strong id="temperatureDifference">
-                                --
-                            </strong>
-
-                            <small>
-                                K
-                            </small>
-
-                        </div>
-
-
-                        <div class="detail-box">
-
-                            <span>
-                                Mechanical Power
-                            </span>
-
-                            <strong id="mechanicalPower">
-                                --
-                            </strong>
-
-                            <small>
-                                W
-                            </small>
-
-                        </div>
-
-
-                    </div>
-
-
-                    <div class="recommendation">
-
-                        <div class="recommendation-title">
-                            Maintenance Recommendation
-                        </div>
-
-                        <p id="recommendation">
-                            --
+                        <p>
+                            Enter the machine parameters and
+                            run the machine learning analysis to generate
+                            a failure-risk assessment.
                         </p>
 
                     </div>
 
 
+                    <div
+                        id="loading"
+                        class="loading hidden"
+                    >
+
+                        <div class="loader-ring"></div>
+
+                        <h3>
+                            Analyzing Machine
+                        </h3>
+
+                        <p>
+                            XGBoost is evaluating operating conditions...
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        id="predictionResult"
+                        class="hidden"
+                    >
+
+
+                        <div
+                            id="riskIndicator"
+                            class="risk-indicator"
+                        >
+                            --
+                        </div>
+
+
+                        <div class="risk-display">
+
+                            <div class="risk-circle">
+
+                                <div class="risk-circle-inner">
+
+                                    <strong id="probability">
+                                        --%
+                                    </strong>
+
+                                    <span>
+                                        FAILURE
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                            <div class="risk-description">
+
+                                <span>
+                                    Current Assessment
+                                </span>
+
+                                <strong id="machineStatus">
+                                    --
+                                </strong>
+
+                                <p>
+                                    Estimated probability
+                                    based on current machine
+                                    operating conditions.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="probability-section">
+
+                            <div class="probability-header">
+
+                                <span>
+                                    Failure Probability
+                                </span>
+
+                                <strong>
+                                    <span id="probabilityText">
+                                        --
+                                    </span>
+                                </strong>
+
+                            </div>
+
+                            <div class="progress-track">
+
+                                <div
+                                    id="probabilityBar"
+                                    class="progress-bar"
+                                ></div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="sensor-grid">
+
+
+                            <div class="sensor-card">
+
+                                <div class="sensor-icon">
+                                    🌡
+                                </div>
+
+                                <div>
+
+                                    <span>
+                                        Temperature Difference
+                                    </span>
+
+                                    <strong>
+                                        <span id="temperatureDifference">
+                                            --
+                                        </span>
+                                        K
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="sensor-card">
+
+                                <div class="sensor-icon">
+                                    ⚡
+                                </div>
+
+                                <div>
+
+                                    <span>
+                                        Mechanical Power
+                                    </span>
+
+                                    <strong>
+                                        <span id="mechanicalPower">
+                                            --
+                                        </span>
+                                        W
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="recommendation">
+
+                            <div class="recommendation-header">
+
+                                <span>
+                                    MAINTENANCE RECOMMENDATION
+                                </span>
+
+                            </div>
+
+                            <p id="recommendation">
+                                --
+                            </p>
+
+                        </div>
+
+                    </div>
+
                 </div>
 
-            </div>
+            </section>
 
 
-        </section>
-
-
-        <section class="model-info">
-
-
-            <div class="model-card">
-
-                <span>
-                    MODEL
-                </span>
-
-                <strong>
-                    Random Forest
-                </strong>
-
-            </div>
-
-
-            <div class="model-card">
-
-                <span>
-                    ROC-AUC
-                </span>
-
-                <strong>
-                    0.9765
-                </strong>
-
-            </div>
-
-
-            <div class="model-card">
-
-                <span>
-                    FAILURE F1
-                </span>
-
-                <strong>
-                    0.83
-                </strong>
-
-            </div>
-
-
-            <div class="model-card">
-
-                <span>
-                    FAILURE RECALL
-                </span>
-
-                <strong>
-                    0.78
-                </strong>
-
-            </div>
-
-
-        </section>
-
-
-        <section class="card history-card">
-
-
-            <div class="section-title">
-
-                <span>
-                    03
-                </span>
+            <section class="section-heading">
 
                 <div>
 
+                    <span>
+                        SYSTEM METRICS
+                    </span>
+
                     <h2>
-                        Recent Predictions
+                        Model Performance
                     </h2>
 
+                </div>
+
+                <p>
+                    Evaluation metrics from the final
+                    XGBoost model.
+                </p>
+
+            </section>
+
+
+            <section class="metrics-grid">
+
+
+                <div class="metric-card">
+
+                    <span class="metric-label">
+                        MODEL
+                    </span>
+
+                    <strong class="metric-value model-value">
+                        XGBoost
+                    </strong>
+
+                    <span class="metric-description">
+                        Final selected model
+                    </span>
+
+                </div>
+
+
+                <div class="metric-card">
+
+                    <span class="metric-label">
+                        ACCURACY
+                    </span>
+
+                    <strong class="metric-value">
+                        99.05%
+                    </strong>
+
+                    <span class="metric-description">
+                        Overall classification
+                    </span>
+
+                </div>
+
+
+                <div class="metric-card">
+
+                    <span class="metric-label">
+                        PRECISION
+                    </span>
+
+                    <strong class="metric-value">
+                        94.55%
+                    </strong>
+
+                    <span class="metric-description">
+                        Positive prediction accuracy
+                    </span>
+
+                </div>
+
+
+                <div class="metric-card">
+
+                    <span class="metric-label">
+                        RECALL
+                    </span>
+
+                    <strong class="metric-value">
+                        76.47%
+                    </strong>
+
+                    <span class="metric-description">
+                        Failure detection rate
+                    </span>
+
+                </div>
+
+
+                <div class="metric-card">
+
+                    <span class="metric-label">
+                        FAILURE F1
+                    </span>
+
+                    <strong class="metric-value">
+                        84.55%
+                    </strong>
+
+                    <span class="metric-description">
+                        Failure classification balance
+                    </span>
+
+                </div>
+
+
+                <div class="metric-card">
+
+                    <span class="metric-label">
+                        ROC-AUC
+                    </span>
+
+                    <strong class="metric-value">
+                        98.36%
+                    </strong>
+
+                    <span class="metric-description">
+                        Ranking performance
+                    </span>
+
+                </div>
+
+
+                <div class="metric-card">
+
+                    <span class="metric-label">
+                        PR-AUC
+                    </span>
+
+                    <strong class="metric-value">
+                        88.91%
+                    </strong>
+
+                    <span class="metric-description">
+                        Failure detection performance
+                    </span>
+
+                </div>
+
+
+            </section>
+
+
+            <section class="section-heading history-heading">
+
+                <div>
+
+                    <span>
+                        MONITORING
+                    </span>
+
+                    <h2>
+                        Prediction History
+                    </h2>
+
+                </div>
+
+                <p>
+                    Recent machine assessments
+                </p>
+
+            </section>
+
+
+            <section class="panel history-panel">
+
+                <div
+                    id="historyEmpty"
+                    class="history-empty"
+                >
+
+                    <div class="history-icon">
+                        ◷
+                    </div>
+
                     <p>
-                        Latest machine condition assessments
+                        No machine predictions recorded yet.
                     </p>
 
                 </div>
 
-            </div>
+
+                <div class="history-table-container">
+
+                    <table
+                        id="historyTable"
+                        class="history-table"
+                    >
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    TIME
+                                </th>
+
+                                <th>
+                                    PRODUCT
+                                </th>
+
+                                <th>
+                                    RISK LEVEL
+                                </th>
+
+                                <th>
+                                    PROBABILITY
+                                </th>
+
+                                <th>
+                                    STATUS
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="historyBody"></tbody>
+
+                    </table>
+
+                </div>
 
 
-            <div
-                id="historyEmpty"
-                class="history-empty"
-            >
-                No predictions recorded yet.
-            </div>
+                <div class="history-actions">
+
+                    <button
+                        id="clearHistoryButton"
+                        class="clear-history-button"
+                        type="button"
+                    >
+                        Clear Prediction History
+                    </button>
+
+                </div>
+
+            </section>
 
 
-            <div class="history-table-container">
+            <section class="model-selection">
 
-                <table
-                    id="historyTable"
-                    class="history-table"
-                >
+                <div class="selection-icon">
+                    ✦
+                </div>
 
-                    <thead>
+                <div class="selection-content">
 
-                        <tr>
+                    <span>
+                        FINAL MODEL SELECTION
+                    </span>
 
-                            <th>
-                                Time
-                            </th>
+                    <h2>
+                        XGBoost
+                    </h2>
 
-                            <th>
-                                Product
-                            </th>
+                    <p>
+                        XGBoost was selected after comparison
+                        with Random Forest. It achieved stronger
+                        overall performance across Accuracy,
+                        Precision, F1-score, ROC-AUC, and PR-AUC,
+                        while Random Forest achieved slightly
+                        higher Recall.
+                    </p>
 
-                            <th>
-                                Risk Level
-                            </th>
+                </div>
 
-                            <th>
-                                Probability
-                            </th>
+                <div class="selection-score">
 
-                            <th>
-                                Status
-                            </th>
+                    <span>
+                        TEST ACCURACY
+                    </span>
 
-                        </tr>
+                    <strong>
+                        99.05%
+                    </strong>
 
-                    </thead>
+                </div>
 
+            </section>
 
-                    <tbody id="historyBody">
-                    </tbody>
-
-                </table>
-
-            </div>
-
-
-            <button
-                id="clearHistoryButton"
-                class="clear-history-button"
-                type="button"
-            >
-                Clear History
-            </button>
-
-
-        </section>
+        </main>
 
 
         <footer>
 
-            <p>
-                Predictive Maintenance System
-            </p>
+            <div class="footer-brand">
+                ⚙ Predictive Maintenance System
+            </div>
 
             <p>
-                Machine Failure Prediction using Random Forest
+                Machine Failure Prediction using XGBoost
             </p>
+
+            <span>
+                Machine-learning-driven preventive maintenance
+            </span>
 
         </footer>
-
 
     </div>
 

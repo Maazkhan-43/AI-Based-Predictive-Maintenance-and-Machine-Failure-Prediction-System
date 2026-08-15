@@ -1,485 +1,319 @@
 const API_URL = "http://127.0.0.1:5000/predict";
 
-const predictionForm =
-    document.getElementById("predictionForm");
-
-const predictButton =
-    document.getElementById("predictButton");
-
-const emptyState =
-    document.getElementById("emptyState");
-
-const loading =
-    document.getElementById("loading");
-
-const predictionResult =
-    document.getElementById("predictionResult");
-
-const riskIndicator =
-    document.getElementById("riskIndicator");
-
-const probability =
-    document.getElementById("probability");
-
-const probabilityBar =
-    document.getElementById("probabilityBar");
-
-const machineStatus =
-    document.getElementById("machineStatus");
-
-const temperatureDifference =
-    document.getElementById("temperatureDifference");
-
-const mechanicalPower =
-    document.getElementById("mechanicalPower");
-
-const recommendation =
-    document.getElementById("recommendation");
-
-const historyBody =
-    document.getElementById("historyBody");
-
-const historyEmpty =
-    document.getElementById("historyEmpty");
-
-const clearHistoryButton =
-    document.getElementById("clearHistoryButton");
-
-let predictionHistory =
-    JSON.parse(
-        localStorage.getItem("predictionHistory")
-    ) || [];
-
-renderHistory();
-
-predictionForm.addEventListener(
-    "submit",
-    async function (event) {
-
-        event.preventDefault();
-
-        const machineData = {
-
-            type:
-                document.getElementById(
-                    "productType"
-                ).value,
-
-            air_temperature:
-                parseFloat(
-                    document.getElementById(
-                        "airTemperature"
-                    ).value
-                ),
-
-            process_temperature:
-                parseFloat(
-                    document.getElementById(
-                        "processTemperature"
-                    ).value
-                ),
-
-            rotational_speed:
-                parseFloat(
-                    document.getElementById(
-                        "rotationalSpeed"
-                    ).value
-                ),
-
-            torque:
-                parseFloat(
-                    document.getElementById(
-                        "torque"
-                    ).value
-                ),
-
-            tool_wear:
-                parseFloat(
-                    document.getElementById(
-                        "toolWear"
-                    ).value
-                )
-        };
-
-        emptyState.classList.add(
-            "hidden"
-        );
-
-        predictionResult.classList.add(
-            "hidden"
-        );
-
-        loading.classList.remove(
-            "hidden"
-        );
-
-        predictButton.disabled = true;
-
-        predictButton.querySelector(
-            "span"
-        ).textContent = "Analyzing...";
-
-        try {
-
-            const response =
-                await fetch(
-                    API_URL,
-                    {
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body:
-                            JSON.stringify(
-                                machineData
-                            )
-                    }
-                );
-
-            if (!response.ok) {
-
-                throw new Error(
-                    "Prediction server returned an error."
-                );
-
-            }
-
-            const result =
-                await response.json();
-
-            displayResult(result);
-
-            savePrediction(
-                machineData,
-                result
-            );
-
-        } catch (error) {
-
-            console.error(error);
-
-            loading.classList.add(
-                "hidden"
-            );
-
-            emptyState.classList.remove(
-                "hidden"
-            );
-
-            alert(
-                "Unable to connect to the prediction server. " +
-                "Make sure Flask is running."
-            );
-
-        } finally {
-
-            predictButton.disabled =
-                false;
-
-            predictButton.querySelector(
-                "span"
-            ).textContent =
-                "Run Failure Analysis";
-        }
-
-    }
-);
-
-
-function displayResult(result) {
-
-    loading.classList.add(
-        "hidden"
-    );
-
-    predictionResult.classList.remove(
-        "hidden"
-    );
-
-    const probabilityValue =
-        Number(
-            result.failure_probability ??
-            result.probability ??
-            0
-        );
-
-    probability.textContent =
-        `${probabilityValue.toFixed(2)}%`;
-
-    probabilityBar.style.width =
-        `${Math.min(
-            probabilityValue,
-            100
-        )}%`;
-
-    temperatureDifference.textContent =
-        Number(
-            result.temperature_difference ??
-            0
-        ).toFixed(2);
-
-    mechanicalPower.textContent =
-        Number(
-            result.mechanical_power ??
-            0
-        ).toFixed(2);
-
-    recommendation.textContent =
-        result.recommendation ??
-        "No recommendation available.";
-
-    const riskLevel =
-        String(
-            result.risk_level ??
-            ""
-        ).toUpperCase();
-
-    riskIndicator.className =
-        "risk-indicator";
-
-    if (riskLevel === "HIGH") {
-
-        riskIndicator.textContent =
-            "🔴 HIGH FAILURE RISK";
-
-        riskIndicator.style.background =
-            "#fee2e2";
-
-        riskIndicator.style.color =
-            "#b91c1c";
-
-        probabilityBar.style.background =
-            "#dc2626";
-
-        machineStatus.textContent =
-            "Immediate Attention Required";
-
-        machineStatus.style.color =
-            "#b91c1c";
-
-    } else if (
-        riskLevel === "MODERATE"
-    ) {
-
-        riskIndicator.textContent =
-            "🟠 MODERATE FAILURE RISK";
-
-        riskIndicator.style.background =
-            "#ffedd5";
-
-        riskIndicator.style.color =
-            "#c2410c";
-
-        probabilityBar.style.background =
-            "#ea580c";
-
-        machineStatus.textContent =
-            "Monitor Machine";
-
-        machineStatus.style.color =
-            "#c2410c";
-
-    } else {
-
-        riskIndicator.textContent =
-            "🟢 LOW FAILURE RISK";
-
-        riskIndicator.style.background =
-            "#dcfce7";
-
-        riskIndicator.style.color =
-            "#15803d";
-
-        probabilityBar.style.background =
-            "#16a34a";
-
-        machineStatus.textContent =
-            "Operating Normally";
-
-        machineStatus.style.color =
-            "#15803d";
-    }
-
-    predictionResult.scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-    });
+const form = document.getElementById("predictionForm");
+const predictButton = document.getElementById("predictButton");
+
+const productType = document.getElementById("productType");
+const airTemperature = document.getElementById("airTemperature");
+const processTemperature = document.getElementById("processTemperature");
+const rotationalSpeed = document.getElementById("rotationalSpeed");
+const torque = document.getElementById("torque");
+const toolWear = document.getElementById("toolWear");
+
+const emptyState = document.getElementById("emptyState");
+const loading = document.getElementById("loading");
+const predictionResult = document.getElementById("predictionResult");
+
+const riskIndicator = document.getElementById("riskIndicator");
+const probability = document.getElementById("probability");
+const probabilityText = document.getElementById("probabilityText");
+const probabilityBar = document.getElementById("probabilityBar");
+
+const machineStatus = document.getElementById("machineStatus");
+const temperatureDifference = document.getElementById("temperatureDifference");
+const mechanicalPower = document.getElementById("mechanicalPower");
+const recommendation = document.getElementById("recommendation");
+
+const historyEmpty = document.getElementById("historyEmpty");
+const historyBody = document.getElementById("historyBody");
+const clearHistoryButton = document.getElementById("clearHistoryButton");
+
+function showEmptyState() {
+    emptyState.classList.remove("hidden");
+    loading.classList.add("hidden");
+    predictionResult.classList.add("hidden");
 }
 
+function showLoadingState() {
+    emptyState.classList.add("hidden");
+    loading.classList.remove("hidden");
+    predictionResult.classList.add("hidden");
 
-function savePrediction(
-    machineData,
-    result
-) {
+    predictButton.disabled = true;
+    predictButton.querySelector("span:first-child").textContent =
+        "Analyzing Machine";
+}
 
-    const probabilityValue =
-        Number(
-            result.failure_probability ??
-            result.probability ??
-            0
-        );
+function showResultState() {
+    emptyState.classList.add("hidden");
+    loading.classList.add("hidden");
+    predictionResult.classList.remove("hidden");
 
-    const riskLevel =
-        String(
-            result.risk_level ??
-            "LOW"
-        ).toUpperCase();
+    predictButton.disabled = false;
+    predictButton.querySelector("span:first-child").textContent =
+        "Run AI Analysis";
+}
 
-    let status;
+function resetButton() {
+    predictButton.disabled = false;
+    predictButton.querySelector("span:first-child").textContent =
+        "Run AI Analysis";
+}
 
-    if (riskLevel === "HIGH") {
-
-        status =
-            "Attention Required";
-
-    } else if (
-        riskLevel === "MODERATE"
-    ) {
-
-        status =
-            "Monitor";
-
-    } else {
-
-        status =
-            "Normal";
+function getRiskClass(risk) {
+    if (risk === "LOW") {
+        return "risk-low";
     }
 
-    const prediction = {
+    if (risk === "MODERATE") {
+        return "risk-moderate";
+    }
 
-        time:
-            new Date().toLocaleTimeString(),
+    return "risk-high";
+}
 
-        product:
-            machineData.type,
+function getMachineStatus(risk) {
+    if (risk === "LOW") {
+        return "Operating Normally";
+    }
 
-        risk:
-            riskLevel,
+    if (risk === "MODERATE") {
+        return "Monitoring Required";
+    }
 
-        probability:
-            probabilityValue,
+    return "Immediate Attention Required";
+}
 
-        status:
-            status
-    };
+function updateRiskDisplay(data) {
+    const probabilityValue = Number(data.failure_probability);
+    const risk = String(data.risk_level).toUpperCase();
 
-    predictionHistory.unshift(
-        prediction
+    const riskClass = getRiskClass(risk);
+
+    riskIndicator.textContent = `${risk} FAILURE RISK`;
+
+    riskIndicator.classList.remove(
+        "risk-low",
+        "risk-moderate",
+        "risk-high"
     );
 
-    predictionHistory =
-        predictionHistory.slice(
-            0,
-            10
+    riskIndicator.classList.add(riskClass);
+
+    probability.textContent = `${probabilityValue.toFixed(2)}%`;
+    probabilityText.textContent = `${probabilityValue.toFixed(2)}%`;
+
+    probabilityBar.style.width = `${Math.min(
+        Math.max(probabilityValue, 0),
+        100
+    )}%`;
+
+    probabilityBar.classList.remove(
+        "risk-low",
+        "risk-moderate",
+        "risk-high"
+    );
+
+    probabilityBar.classList.add(riskClass);
+
+    machineStatus.textContent = getMachineStatus(risk);
+
+    machineStatus.classList.remove(
+        "risk-low",
+        "risk-moderate",
+        "risk-high"
+    );
+
+    machineStatus.classList.add(riskClass);
+
+    temperatureDifference.textContent =
+        Number(data.temperature_difference).toFixed(2);
+
+    mechanicalPower.textContent =
+        Number(data.mechanical_power).toFixed(2);
+
+    recommendation.textContent =
+        data.recommendation || "No recommendation available.";
+}
+
+function getHistory() {
+    try {
+        return JSON.parse(
+            localStorage.getItem("predictionHistory") || "[]"
         );
+    } catch {
+        return [];
+    }
+}
+
+function saveHistory(data) {
+    const history = getHistory();
+
+    history.unshift(data);
+
+    if (history.length > 10) {
+        history.splice(10);
+    }
 
     localStorage.setItem(
         "predictionHistory",
-        JSON.stringify(
-            predictionHistory
-        )
+        JSON.stringify(history)
     );
-
-    renderHistory();
 }
 
+function getStatusText(item) {
+    if (item.risk_level === "LOW") {
+        return "Normal";
+    }
+
+    if (item.risk_level === "MODERATE") {
+        return "Monitor";
+    }
+
+    return "Attention";
+}
+
+function getStatusClass(item) {
+    if (item.risk_level === "LOW") {
+        return "status-normal";
+    }
+
+    if (item.risk_level === "MODERATE") {
+        return "status-monitor";
+    }
+
+    return "status-attention";
+}
 
 function renderHistory() {
+    const history = getHistory();
 
     historyBody.innerHTML = "";
 
-    if (
-        predictionHistory.length === 0
-    ) {
-
-        historyEmpty.classList.remove(
-            "hidden"
-        );
-
+    if (history.length === 0) {
+        historyEmpty.classList.remove("hidden");
         return;
     }
 
-    historyEmpty.classList.add(
-        "hidden"
-    );
+    historyEmpty.classList.add("hidden");
 
-    predictionHistory.forEach(
-        function (item) {
+    history.forEach(item => {
+        const row = document.createElement("tr");
 
-            const row =
-                document.createElement(
-                    "tr"
-                );
+        const time = new Date(item.timestamp);
 
-            let riskClass;
-            let statusClass;
+        const formattedTime = time.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit"
+        });
 
-            if (
-                item.risk === "HIGH"
-            ) {
+        const riskClass = getRiskClass(item.risk_level);
+        const statusClass = getStatusClass(item);
 
-                riskClass =
-                    "risk-high";
+        row.innerHTML = `
+            <td>${formattedTime}</td>
+            <td>${item.type}</td>
+            <td class="${riskClass}">
+                ${item.risk_level}
+            </td>
+            <td>
+                ${Number(item.failure_probability).toFixed(2)}%
+            </td>
+            <td class="${statusClass}">
+                ${getStatusText(item)}
+            </td>
+        `;
 
-                statusClass =
-                    "status-attention";
-
-            } else if (
-                item.risk === "MODERATE"
-            ) {
-
-                riskClass =
-                    "risk-moderate";
-
-                statusClass =
-                    "status-monitor";
-
-            } else {
-
-                riskClass =
-                    "risk-low";
-
-                statusClass =
-                    "status-normal";
-            }
-
-            row.innerHTML = `
-                <td>${item.time}</td>
-                <td>${item.product}</td>
-                <td class="${riskClass}">
-                    ${item.risk}
-                </td>
-                <td>
-                    ${Number(
-                        item.probability
-                    ).toFixed(2)}%
-                </td>
-                <td class="${statusClass}">
-                    ${item.status}
-                </td>
-            `;
-
-            historyBody.appendChild(
-                row
-            );
-        }
-    );
+        historyBody.appendChild(row);
+    });
 }
 
+async function runPrediction(event) {
+    event.preventDefault();
+
+    const requestData = {
+        type: productType.value,
+        air_temperature: Number(airTemperature.value),
+        process_temperature: Number(processTemperature.value),
+        rotational_speed: Number(rotationalSpeed.value),
+        torque: Number(torque.value),
+        tool_wear: Number(toolWear.value)
+    };
+
+    if (
+        !requestData.type ||
+        !Number.isFinite(requestData.air_temperature) ||
+        !Number.isFinite(requestData.process_temperature) ||
+        !Number.isFinite(requestData.rotational_speed) ||
+        !Number.isFinite(requestData.torque) ||
+        !Number.isFinite(requestData.tool_wear)
+    ) {
+        alert("Please enter valid machine parameters.");
+        return;
+    }
+
+    showLoadingState();
+
+    try {
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(requestData)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.error || "Prediction request failed."
+            );
+        }
+
+        updateRiskDisplay(data);
+
+        saveHistory({
+            timestamp: new Date().toISOString(),
+            type: requestData.type,
+            air_temperature: requestData.air_temperature,
+            process_temperature: requestData.process_temperature,
+            rotational_speed: requestData.rotational_speed,
+            torque: requestData.torque,
+            tool_wear: requestData.tool_wear,
+            failure_probability: data.failure_probability,
+            risk_level: data.risk_level,
+            prediction: data.prediction
+        });
+
+        renderHistory();
+        showResultState();
+
+    } catch (error) {
+        console.error("Prediction error:", error);
+
+        resetButton();
+
+        alert(
+            "Unable to connect to the prediction API.\n\n" +
+            "Make sure Flask is running on port 5000."
+        );
+
+        showEmptyState();
+    }
+}
+
+function clearHistory() {
+    localStorage.removeItem("predictionHistory");
+    renderHistory();
+}
+
+form.addEventListener("submit", runPrediction);
 
 clearHistoryButton.addEventListener(
     "click",
-    function () {
-
-        predictionHistory = [];
-
-        localStorage.removeItem(
-            "predictionHistory"
-        );
-
-        renderHistory();
-    }
+    clearHistory
 );
+
+renderHistory();
+showEmptyState();
