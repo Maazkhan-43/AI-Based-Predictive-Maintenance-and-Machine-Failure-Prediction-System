@@ -1,10 +1,30 @@
+import os
 import numpy as np
 import pandas as pd
 import joblib
 
-MODEL_PATH = "models/random_forest_pipeline.pkl"
+BASE_DIR = os.path.dirname(
+    os.path.dirname(
+        os.path.abspath(__file__)
+    )
+)
+
+MODEL_PATH = os.path.join(
+    BASE_DIR,
+    "models",
+    "xgboost",
+    "xgboost_model.pkl"
+)
+
+PREPROCESSOR_PATH = os.path.join(
+    BASE_DIR,
+    "models",
+    "xgboost",
+    "xgboost_preprocessor.pkl"
+)
 
 model = joblib.load(MODEL_PATH)
+preprocessor = joblib.load(PREPROCESSOR_PATH)
 
 
 def predict_machine_failure(
@@ -31,22 +51,33 @@ def predict_machine_failure(
         "Rotational speed [rpm]": [rotational_speed],
         "Torque [Nm]": [torque],
         "Tool wear [min]": [tool_wear],
-        "Temperature difference [K]": [temperature_difference],
-        "Mechanical power [W]": [mechanical_power]
+        "Temperature difference [K]": [
+            temperature_difference
+        ],
+        "Mechanical power [W]": [
+            mechanical_power
+        ]
     })
 
-    prediction = model.predict(input_data)[0]
+    processed_data = preprocessor.transform(
+        input_data
+    )
+
+    prediction = model.predict(
+        processed_data
+    )[0]
 
     failure_class_index = list(
         model.classes_
     ).index(1)
 
     failure_probability = model.predict_proba(
-        input_data
+        processed_data
     )[0][failure_class_index]
 
-    probability_percentage = (
-        failure_probability * 100
+    probability_percentage = round(
+        float(failure_probability * 100),
+        2
     )
 
     if probability_percentage >= 70:
@@ -78,85 +109,20 @@ def predict_machine_failure(
 
     return {
         "prediction": int(prediction),
-        "failure_probability": round(
-            probability_percentage,
-            2
-        ),
+
+        "failure_probability": probability_percentage,
+
         "risk_level": risk_level,
+
         "recommendation": recommendation,
+
         "temperature_difference": round(
-            temperature_difference,
+            float(temperature_difference),
             2
         ),
+
         "mechanical_power": round(
-            mechanical_power,
+            float(mechanical_power),
             2
         )
     }
-
-
-def get_feature_importance():
-
-    try:
-
-        preprocessor = model.named_steps[
-            "preprocessor"
-        ]
-
-        classifier = model.named_steps[
-            "classifier"
-        ]
-
-        feature_names = (
-            preprocessor
-            .get_feature_names_out()
-        )
-
-        importances = (
-            classifier.feature_importances_
-        )
-
-        feature_data = []
-
-        for name, importance in zip(
-            feature_names,
-            importances
-        ):
-
-            clean_name = name
-
-            if clean_name.startswith(
-                "num__"
-            ):
-                clean_name = clean_name[
-                    5:
-                ]
-
-            elif clean_name.startswith(
-                "cat__"
-            ):
-
-                clean_name = clean_name[
-                    5:
-                ]
-
-            feature_data.append({
-                "feature": clean_name,
-                "importance": round(
-                    float(importance) * 100,
-                    2
-                )
-            })
-
-        feature_data.sort(
-            key=lambda x: x["importance"],
-            reverse=True
-        )
-
-        return feature_data
-
-    except Exception as error:
-
-        raise RuntimeError(
-            f"Unable to extract feature importance: {error}"
-        )

@@ -4,18 +4,10 @@ from flask_cors import CORS
 from prediction import predict_machine_failure
 
 
-# ============================================================
-# CREATE FLASK APPLICATION
-# ============================================================
-
 app = Flask(__name__)
 
 CORS(app)
 
-
-# ============================================================
-# HOME ROUTE
-# ============================================================
 
 @app.route("/", methods=["GET"])
 def home():
@@ -26,27 +18,45 @@ def home():
     })
 
 
-# ============================================================
-# PREDICTION ROUTE
-# ============================================================
-
 @app.route("/predict", methods=["POST"])
 def predict():
 
     try:
 
-        # ----------------------------------------------------
-        # RECEIVE JSON DATA
-        # ----------------------------------------------------
-
         data = request.get_json()
 
+        if not data:
+            return jsonify({
+                "error": "No JSON data received."
+            }), 400
 
-        # ----------------------------------------------------
-        # EXTRACT INPUTS
-        # ----------------------------------------------------
+        required_fields = [
+            "type",
+            "air_temperature",
+            "process_temperature",
+            "rotational_speed",
+            "torque",
+            "tool_wear"
+        ]
+
+        missing_fields = [
+            field
+            for field in required_fields
+            if field not in data
+        ]
+
+        if missing_fields:
+            return jsonify({
+                "error": "Missing required fields.",
+                "fields": missing_fields
+            }), 400
 
         product_type = data["type"]
+
+        if product_type not in ["L", "M", "H"]:
+            return jsonify({
+                "error": "Invalid product type. Use L, M, or H."
+            }), 400
 
         air_temperature = float(
             data["air_temperature"]
@@ -68,11 +78,6 @@ def predict():
             data["tool_wear"]
         )
 
-
-        # ----------------------------------------------------
-        # RUN MODEL
-        # ----------------------------------------------------
-
         result = predict_machine_failure(
             product_type,
             air_temperature,
@@ -82,24 +87,22 @@ def predict():
             tool_wear
         )
 
-
-        # ----------------------------------------------------
-        # RETURN JSON RESPONSE
-        # ----------------------------------------------------
-
         return jsonify(result)
+
+
+    except ValueError:
+
+        return jsonify({
+            "error": "Invalid numeric input."
+        }), 400
 
 
     except Exception as error:
 
         return jsonify({
             "error": str(error)
-        }), 400
+        }), 500
 
-
-# ============================================================
-# RUN SERVER
-# ============================================================
 
 if __name__ == "__main__":
 
