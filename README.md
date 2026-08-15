@@ -1,173 +1,98 @@
-# Predictive Maintenance — Machine Failure Prediction
+# Predictive Maintenance – Machine Failure Prediction
 
-## Overview
+## 1. Project Overview
 
-This project develops a machine learning-based predictive maintenance
-system that analyzes machine operating conditions and predicts the
-probability of machine failure.
+Predictive maintenance aims to identify potential machine failures before they occur by analyzing machine operating conditions.
 
-The goal is to identify potentially abnormal operating conditions
-before equipment failure occurs, allowing maintenance teams to take
-preventive action.
+This project develops a machine learning-based predictive maintenance system that estimates the probability of machine failure from operating parameters such as temperature, rotational speed, torque, and tool wear.
 
-## Problem Statement
+The system compares multiple machine learning approaches and uses a tuned XGBoost model for the final prediction system.
 
-Unexpected machine failures can result in production downtime,
-maintenance costs, and operational losses.
+---
 
-Traditional maintenance approaches may rely on fixed schedules or
-reactive maintenance after a failure has occurred.
+## 2. Problem Statement
 
-This project investigates whether machine operating parameters such
-as temperature, rotational speed, torque, and tool wear can be used
-to predict machine failures using supervised machine learning.
+Unexpected machine failures can cause production downtime, maintenance costs, equipment damage, and operational delays.
 
-## Dataset
+Traditional maintenance approaches such as reactive maintenance often identify problems only after a failure has occurred, while fixed-schedule preventive maintenance may result in unnecessary maintenance.
 
-The project uses a machine predictive maintenance dataset containing
-10,000 machine observations.
+This project addresses the problem by developing a data-driven system capable of estimating machine failure risk from current operating conditions and providing an actionable maintenance recommendation.
 
-The dataset contains operating variables including:
+---
 
-- Air temperature
-- Process temperature
-- Rotational speed
+## 3. Objectives
+
+- Predict whether a machine is likely to fail.
+- Estimate the probability of machine failure.
+- Compare different machine learning models.
+- Tune the selected machine learning model.
+- Analyze classification performance using suitable evaluation metrics.
+- Provide interpretable risk levels.
+- Develop a web-based interface for real-time predictions.
+- Expose the trained model through a Flask REST API.
+
+---
+
+## 4. Machine Learning Approach
+
+The project uses machine operating parameters including:
+
+- Product Type
+- Air Temperature
+- Process Temperature
+- Rotational Speed
 - Torque
-- Tool wear
-- Product type
+- Tool Wear
 
-The target variable is:
+Two additional derived features are calculated:
 
-`Machine failure`
+- Temperature Difference
+- Mechanical Power
 
-The target represents whether a machine failure occurred.
+### Models Evaluated
 
-## Data Preprocessing
+- Random Forest
+- XGBoost
 
-The following preprocessing steps were performed:
+The models were evaluated using:
 
-- Checked for missing values
-- Checked for duplicate observations
-- Removed identifier columns
-- Excluded failure-mode variables that could introduce target leakage
-- Encoded categorical product type
-- Prepared numerical features for model training
-- Performed a stratified train-test split
+- Accuracy
+- Precision
+- Recall
+- F1 Score
+- ROC-AUC
+- PR-AUC
 
-The dataset contained 10,000 observations with no missing values
-and no duplicate rows.
+PR-AUC was given particular importance because machine failure is a relatively rare event and class imbalance makes accuracy alone insufficient for evaluating failure detection.
 
-## Exploratory Data Analysis
+---
 
-Exploratory analysis was performed to investigate relationships
-between machine operating conditions and failure.
+## 5. Model Comparison
 
-The analysis examined:
+The initial models were evaluated on the held-out test set.
 
-- Temperature distributions
-- Rotational speed
-- Torque
-- Tool wear
-- Failure rates by product type
-- Correlations between numerical variables
-- Failure rates across tool-wear ranges
+| Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC | PR-AUC |
+|---|---:|---:|---:|---:|---:|---:|
+| Random Forest | 0.9895 | 0.8983 | 0.7794 | 0.8346 | 0.9765 | 0.8415 |
+| XGBoost | 0.9905 | 0.9455 | 0.7647 | 0.8455 | 0.9836 | 0.8891 |
+| Tuned XGBoost | 0.9900 | 0.9138 | 0.7794 | 0.8413 | 0.9802 | 0.8822 |
 
-The analysis indicated that variables such as torque and tool wear
-show meaningful differences between normal and failure observations.
+XGBoost provided stronger overall discrimination, particularly in PR-AUC and ROC-AUC.
 
-## Feature Engineering
+After hyperparameter tuning, the tuned XGBoost model was selected as the final machine learning model for deployment.
 
-Two additional features were created:
+---
 
-### Temperature Difference
+## 6. XGBoost Hyperparameter Tuning
 
-Process temperature minus air temperature.
+The final XGBoost model was tuned using cross-validation.
 
-### Mechanical Power
-
-Mechanical power was estimated from rotational speed and torque.
-
-These engineered features were included to provide the model with
-additional representations of machine operating conditions.
-
-## Machine Learning Models
-
-Two supervised classification models were evaluated:
-
-1. Logistic Regression
-2. Random Forest
-
-Logistic Regression was used as a baseline model.
-
-Random Forest was then evaluated to capture nonlinear relationships
-between machine operating conditions and failure.
-
-## Model Results
-
-### Logistic Regression
-
-- Accuracy: 85.85%
-- Precision: 17.72%
-- Recall: 86.76%
-- F1 Score: 29.43%
-- ROC-AUC: 93.40%
-- PR-AUC: 46.59%
-
-### Random Forest
-
-- Accuracy: 98.95%
-- Precision: 89.83%
-- Recall: 77.94%
-- F1 Score: 83.46%
-- ROC-AUC: 97.65%
-- PR-AUC: 84.15%
-
-Random Forest was selected as the final model because it provided
-a substantially better overall balance between precision, recall,
-F1-score and ranking performance on the imbalanced failure
-prediction problem.
-
-## Application
-
-A Streamlit-based prediction application was developed.
-
-The application accepts:
-
-- Product type
-- Air temperature
-- Process temperature
-- Rotational speed
-- Torque
-- Tool wear
-
-and produces:
-
-- Failure probability
-- Failure risk classification
-- Maintenance recommendation
-
-## Project Structure
+Best parameters:
 
 ```text
-predictive-maintenance/
-│
-├── app/
-│   └── app.py
-│
-├── data/
-│   ├── raw/
-│   ├── processed/
-│   └── results/
-│
-├── models/
-│   └── random_forest_pipeline.pkl
-│
-├── notebooks/
-│   ├── 01_dataset_understanding.ipynb
-│   ├── 02_data_preprocessing.ipynb
-│   ├── 03_exploratory_data_analysis.ipynb
-│   ├── 04_feature_engineering.ipynb
-│   └── 05_model_training.ipynb
-│
-├── .gitignore
-└── README.md
+n_estimators = 100
+max_depth = 6
+learning_rate = 0.1
+subsample = 0.8
+colsample_bytree = 1.0
+min_child_weight = 1
